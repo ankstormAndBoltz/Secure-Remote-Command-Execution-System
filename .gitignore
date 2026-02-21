@@ -1,4 +1,7 @@
+# Ignore Python cache
 __pycache__/
 *.pyc
+
+# Ignore database & logs
 SecureRemoteExec/auth/users.txt
 SecureRemoteExec/client/logs.txt
