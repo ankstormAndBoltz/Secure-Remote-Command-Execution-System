@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+SecureRemoteExec/auth/users.txt
+SecureRemoteExec/client/logs.txt
