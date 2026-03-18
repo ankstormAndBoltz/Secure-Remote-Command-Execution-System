@@ -1,1 +1,26 @@
-
+2026-03-12 22:11:48 | ('127.0.0.1', 63994) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:11:48 | ('127.0.0.1', 63994) | admin | whoami | EXECUTED | 
+2026-03-12 22:20:02 | ('127.0.0.1', 56780) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:20:11 | ('127.0.0.1', 56780) | admin | whoami | EXECUTED | 
+2026-03-12 22:20:14 | ('127.0.0.1', 56780) | admin | pwd | EXECUTED | 
+2026-03-12 22:20:16 | ('127.0.0.1', 56780) | admin | ls | EXECUTED | 
+2026-03-12 22:20:23 | ('127.0.0.1', 56780) | admin | date | FAILED | 
+2026-03-12 22:25:42 | ('127.0.0.1', 57312) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:25:50 | ('127.0.0.1', 57312) | admin | pwd | EXECUTED | 
+2026-03-12 22:26:02 | ('127.0.0.1', 57312) | admin | ls | EXECUTED | 
+2026-03-12 22:26:16 | ('127.0.0.1', 57312) | admin | whoami | EXECUTED | 
+2026-03-12 22:27:16 | ('127.0.0.1', 57312) | admin | ls | EXECUTED | 
+2026-03-12 22:27:27 | ('127.0.0.1', 57312) | admin | whoami | EXECUTED | 
+2026-03-12 22:29:04 | ('127.0.0.1', 58587) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:30:04 | ('127.0.0.1', 58587) | admin | (error) | ERROR | The read operation timed out
+2026-03-12 22:30:41 | ('127.0.0.1', 52101) | ad | LOGIN | FAILED | Invalid credentials
+2026-03-12 22:58:07 | ('127.0.0.1', 54234) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:58:11 | ('127.0.0.1', 54234) | admin | ls | EXECUTED | 
+2026-03-12 22:58:13 | ('127.0.0.1', 54234) | admin | pwd | EXECUTED | 
+2026-03-12 22:58:17 | ('127.0.0.1', 54234) | admin | date | FAILED | 
+2026-03-12 22:58:28 | ('127.0.0.1', 54234) | admin | whoami | EXECUTED | 
+2026-03-12 22:59:28 | ('127.0.0.1', 54234) | admin | (error) | ERROR | The read operation timed out
+2026-03-13 11:15:06 | ('127.0.0.1', 63479) | admin | LOGIN | SUCCESS | 
+2026-03-13 11:15:16 | ('127.0.0.1', 63479) | admin | ls | EXECUTED | 
+2026-03-13 11:15:18 | ('127.0.0.1', 63479) | admin | pwd | EXECUTED | 
+2026-03-13 11:15:29 | ('127.0.0.1', 63479) | admin | whoami | EXECUTED | 
