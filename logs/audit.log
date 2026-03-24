@@ -1,1 +1,67 @@
-
+2026-03-12 22:11:48 | ('127.0.0.1', 63994) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:11:48 | ('127.0.0.1', 63994) | admin | whoami | EXECUTED | 
+2026-03-12 22:20:02 | ('127.0.0.1', 56780) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:20:11 | ('127.0.0.1', 56780) | admin | whoami | EXECUTED | 
+2026-03-12 22:20:14 | ('127.0.0.1', 56780) | admin | pwd | EXECUTED | 
+2026-03-12 22:20:16 | ('127.0.0.1', 56780) | admin | ls | EXECUTED | 
+2026-03-12 22:20:23 | ('127.0.0.1', 56780) | admin | date | FAILED | 
+2026-03-12 22:25:42 | ('127.0.0.1', 57312) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:25:50 | ('127.0.0.1', 57312) | admin | pwd | EXECUTED | 
+2026-03-12 22:26:02 | ('127.0.0.1', 57312) | admin | ls | EXECUTED | 
+2026-03-12 22:26:16 | ('127.0.0.1', 57312) | admin | whoami | EXECUTED | 
+2026-03-12 22:27:16 | ('127.0.0.1', 57312) | admin | ls | EXECUTED | 
+2026-03-12 22:27:27 | ('127.0.0.1', 57312) | admin | whoami | EXECUTED | 
+2026-03-12 22:29:04 | ('127.0.0.1', 58587) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:30:04 | ('127.0.0.1', 58587) | admin | (error) | ERROR | The read operation timed out
+2026-03-12 22:30:41 | ('127.0.0.1', 52101) | ad | LOGIN | FAILED | Invalid credentials
+2026-03-12 22:58:07 | ('127.0.0.1', 54234) | admin | LOGIN | SUCCESS | 
+2026-03-12 22:58:11 | ('127.0.0.1', 54234) | admin | ls | EXECUTED | 
+2026-03-12 22:58:13 | ('127.0.0.1', 54234) | admin | pwd | EXECUTED | 
+2026-03-12 22:58:17 | ('127.0.0.1', 54234) | admin | date | FAILED | 
+2026-03-12 22:58:28 | ('127.0.0.1', 54234) | admin | whoami | EXECUTED | 
+2026-03-12 22:59:28 | ('127.0.0.1', 54234) | admin | (error) | ERROR | The read operation timed out
+2026-03-13 11:15:06 | ('127.0.0.1', 63479) | admin | LOGIN | SUCCESS | 
+2026-03-13 11:15:16 | ('127.0.0.1', 63479) | admin | ls | EXECUTED | 
+2026-03-13 11:15:18 | ('127.0.0.1', 63479) | admin | pwd | EXECUTED | 
+2026-03-13 11:15:29 | ('127.0.0.1', 63479) | admin | whoami | EXECUTED | 
+2026-03-23 22:25:10 | ('127.0.0.1', 64220) | admin | LOGIN | SUCCESS | 
+2026-03-23 22:25:36 | ('127.0.0.1', 64220) | admin | ls | EXECUTED | 
+2026-03-23 22:26:36 | ('127.0.0.1', 64220) | admin | (error) | ERROR | The read operation timed out
+2026-03-23 22:26:36 | ('127.0.0.1', 64220) | admin | LOGOUT | SUCCESS | 
+2026-03-23 22:32:05 | ('127.0.0.1', 49406) | admin | LOGIN | SUCCESS | 
+2026-03-23 22:32:19 | ('127.0.0.1', 49406) | admin | ls | EXECUTED | 
+2026-03-23 22:32:25 | ('127.0.0.1', 49406) | admin | pwd | EXECUTED | 
+2026-03-23 22:32:29 | ('127.0.0.1', 49406) | admin | cd | EXECUTED | 
+2026-03-23 22:32:33 | ('127.0.0.1', 49406) | admin | date | FAILED | 
+2026-03-23 22:32:38 | ('127.0.0.1', 49406) | admin | whoami | EXECUTED | 
+2026-03-23 22:32:44 | ('127.0.0.1', 49406) | admin | dir | EXECUTED | 
+2026-03-23 22:33:14 | ('127.0.0.1', 49406) | admin | LOGOUT | SUCCESS | 
+2026-03-23 22:33:15 | ('127.0.0.1', 51514) | student | LOGIN | FAILED | Invalid credentials
+2026-03-23 22:33:24 | ('127.0.0.1', 51515) | student | LOGIN | SUCCESS | 
+2026-03-23 22:33:44 | ('127.0.0.1', 51515) | student | LOGOUT | SUCCESS | 
+2026-03-24 08:32:28 | ('127.0.0.1', 52813) | admin | LOGIN | SUCCESS | 
+2026-03-24 08:33:01 | ('127.0.0.1', 52813) | admin | LOGOUT | SUCCESS | 
+2026-03-24 08:33:16 | ('127.0.0.1', 59603) | admin | LOGIN | SUCCESS | 
+2026-03-24 08:33:40 | ('127.0.0.1', 59603) | admin | LOGOUT | SUCCESS | 
+2026-03-24 08:44:05 | ('127.0.0.1', 59168) | ankith | REGISTER | SUCCESS | 
+2026-03-24 08:44:10 | ('127.0.0.1', 59170) | ankith | LOGIN | SUCCESS | 
+2026-03-24 08:44:35 | ('127.0.0.1', 59170) | ankith | LOGOUT | SUCCESS | 
+2026-03-24 08:44:38 | ('127.0.0.1', 59172) | ankith | LOGIN | SUCCESS | 
+2026-03-24 08:44:40 | ('127.0.0.1', 59172) | ankith | LOGOUT | SUCCESS | 
+2026-03-24 08:46:51 | ('127.0.0.1', 49674) | admin | LOGIN | SUCCESS | 
+2026-03-24 08:47:01 | ('127.0.0.1', 49674) | admin | LOGOUT | SUCCESS | 
+2026-03-24 08:47:46 | ('127.0.0.1', 49678) | admin | LOGIN | SUCCESS | 
+2026-03-24 08:47:48 | ('127.0.0.1', 49678) | admin | whoami | EXECUTED | 
+2026-03-24 08:47:51 | ('127.0.0.1', 49678) | admin | pwd | EXECUTED | 
+2026-03-24 08:47:53 | ('127.0.0.1', 49678) | admin | date | FAILED | 
+2026-03-24 08:47:55 | ('127.0.0.1', 49678) | admin | dir | EXECUTED | 
+2026-03-24 08:48:45 | ('127.0.0.1', 49678) | admin | LOGOUT | SUCCESS | 
+2026-03-24 08:48:47 | ('127.0.0.1', 49681) | ankith | REGISTER | FAILED | User exists
+2026-03-24 08:48:53 | ('127.0.0.1', 49682) | ankith1 | REGISTER | SUCCESS | 
+2026-03-24 08:48:57 | ('127.0.0.1', 49683) | ankith1 | LOGIN | SUCCESS | 
+2026-03-24 08:49:02 | ('127.0.0.1', 49683) | ankith1 | ls | EXECUTED | 
+2026-03-24 08:49:09 | ('127.0.0.1', 49683) | ankith1 | pwd | EXECUTED | 
+2026-03-24 08:49:18 | ('127.0.0.1', 49683) | ankith1 | ls | EXECUTED | 
+2026-03-24 08:49:20 | ('127.0.0.1', 49683) | ankith1 | dir | EXECUTED | 
+2026-03-24 08:49:22 | ('127.0.0.1', 49683) | ankith1 | date | FAILED | 
+2026-03-24 08:49:26 | ('127.0.0.1', 49683) | ankith1 | LOGOUT | SUCCESS | 
