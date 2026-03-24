@@ -1,7 +1,7 @@
 """
-Secure Remote Command Execution System - Server
-UPDATED: Full rewrite with SSL/TLS, JSON protocol, message framing,
-server-side authentication, PBKDF2, proper logging, and threading.
+Secure Multi-Client Command Execution Server
+TLS-enabled, JSON protocol with message framing, authentication,
+and threaded client handling.
 """
 
 import json
@@ -20,17 +20,17 @@ from ssl_config import create_server_ssl_context
 HOST = "0.0.0.0"
 PORT = 5000
 
-# UPDATED: Allow only these commands; use shell=False
-ALLOWED_COMMANDS = ["ls", "pwd", "date", "whoami"]
-
-# UPDATED: Absolute path for audit log
+# Absolute path for audit log
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 USER_DB = os.path.join(BASE_DIR, "users.txt")
 LOG_DIR = os.path.join(BASE_DIR, "..", "logs")
 LOG_FILE = os.path.join(LOG_DIR, "audit.log")
 SOCKET_TIMEOUT = 60
 
-# --------------- UPDATED: Message framing (length-prefixed protocol) ---------------
+# Allow only safe commands to execute remotely
+ALLOWED_COMMANDS = ["ls", "pwd", "date", "whoami", "dir", "cd"]
+
+# --------------- Message framing (length-prefixed protocol) ---------------
 
 def send_message(sock, obj):
     """
@@ -70,7 +70,7 @@ def _recv_exact(sock, n):
         data += chunk
     return data
 
-# --------------- UPDATED: PBKDF2 password hashing ---------------
+# --------------- PBKDF2 password hashing ---------------
 
 def hash_password(password: str, salt: bytes = None) -> tuple:
     """Hash password using PBKDF2-HMAC-SHA256 with 100,000 iterations."""
@@ -91,13 +91,32 @@ def verify_password(input_password: str, stored_salt_hex: str, stored_hash: str)
     return secrets.compare_digest(computed, stored_hash)
 
 def ensure_user_db():
-    """Create users.txt if missing; add default user."""
-    if not os.path.exists(USER_DB):
-        os.makedirs(os.path.dirname(USER_DB) or ".", exist_ok=True)
-        # UPDATED: Create default user with PBKDF2
-        salt_hex, hash_hex = hash_password("admin123")
-        with open(USER_DB, "w") as f:
-            f.write(f"admin:{salt_hex}:{hash_hex}\n")
+    """Create/patch users.txt so required default users are present."""
+    os.makedirs(os.path.dirname(USER_DB) or ".", exist_ok=True)
+
+    required_users = {
+        "admin": "admin123",
+        "student": "student123",
+    }
+
+    existing_users = set()
+    if os.path.exists(USER_DB):
+        with open(USER_DB, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(":")
+                if len(parts) == 3:
+                    existing_users.add(parts[0])
+
+    missing = [u for u in required_users if u not in existing_users]
+    if missing:
+        mode = "a" if os.path.exists(USER_DB) else "w"
+        with open(USER_DB, mode, encoding="utf-8") as f:
+            for user in missing:
+                salt_hex, hash_hex = hash_password(required_users[user])
+                f.write(f"{user}:{salt_hex}:{hash_hex}\n")
 
 def verify_user(username: str, password: str) -> bool:
     """Verify credentials against user database."""
@@ -116,18 +135,29 @@ def verify_user(username: str, password: str) -> bool:
                 return verify_password(password, stored_salt, stored_hash)
     return False
 
+def user_exists(username: str) -> bool:
+    """Check if username already exists in user database."""
+    if not os.path.exists(USER_DB):
+        return False
+    with open(USER_DB, "r", encoding="utf-8") as f:
+        for line in f:
+            parts = line.strip().split(":")
+            if len(parts) == 3 and parts[0] == username:
+                return True
+    return False
+
 def register_user(username: str, password: str):
-    """Register a new user (for setup)."""
+    """Register a new user in users database."""
     salt_hex, hash_hex = hash_password(password)
-    with open(USER_DB, "a") as f:
+    with open(USER_DB, "a", encoding="utf-8") as f:
         f.write(f"{username}:{salt_hex}:{hash_hex}\n")
 
-# --------------- UPDATED: Logging with absolute path ---------------
+# --------------- Logging with absolute path ---------------
 
-def log_audit(username: str, addr, command: str, status: str, message: str = ""):
-    """Write audit log with timestamp, username, command, status."""
+def log_audit(username: str, addr, action: str, status: str, message: str = ""):
+    """Write audit log with timestamp, username, action, status."""
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    entry = f"{timestamp} | {addr} | {username} | {command} | {status} | {message}\n"
+    entry = f"{timestamp} | {addr} | {username} | {action} | {status} | {message}\n"
     try:
         os.makedirs(LOG_DIR, exist_ok=True)
         with open(LOG_FILE, "a", encoding="utf-8") as f:
@@ -135,55 +165,54 @@ def log_audit(username: str, addr, command: str, status: str, message: str = "")
     except OSError as e:
         print(f"[WARN] Audit log write failed: {e}")
 
-# --------------- UPDATED: Command execution (shell=False) ---------------
-
 def execute_command(command: str) -> tuple[str, int]:
     """
-    Execute allowed command. Returns (output, exit_code).
-    UPDATED: shell=False for security; only ALLOWED_COMMANDS.
+    Execute allowed command only. Returns (output, exit_code).
     """
-    cmd = command.strip().lower()
-    # Split for commands like "ls -la" -> ["ls", "-la"]
     parts = command.strip().split()
     base_cmd = parts[0].lower() if parts else ""
 
     if base_cmd not in ALLOWED_COMMANDS:
-        return "Error: Command not allowed", -1
+        return f"Error: Command '{base_cmd}' is not allowed", -1
 
     try:
-        # UPDATED: shell=False for security
-        # Map Unix commands to Windows equivalents when needed
-        if os.name == "nt" and base_cmd in ("ls", "pwd"):
-            cmd_list = ["cmd", "/c", "dir"] if base_cmd == "ls" else ["cmd", "/c", "cd"]
+        # Map Unix-like aliases to Windows-friendly commands
+        if os.name == "nt":
+            if base_cmd in ("ls", "dir"):
+                cmd_list = ["cmd", "/c", "dir"]
+            elif base_cmd in ("pwd", "cd"):
+                cmd_list = ["cmd", "/c", "cd"]
+            else:
+                cmd_list = parts if len(parts) > 1 else [base_cmd]
         else:
             cmd_list = parts if len(parts) > 1 else [base_cmd]
+
         result = subprocess.run(
             cmd_list,
             capture_output=True,
             shell=False,
-            timeout=10,
+            timeout=15,
             cwd=os.getcwd(),
         )
         output = (result.stdout or result.stderr or b"").decode("utf-8", errors="replace")
         return output or "(no output)", result.returncode
     except FileNotFoundError:
-        return f"Error: Command '{base_cmd}' not found (may require Linux/WSL)", -1
+        return f"Error: Command '{base_cmd}' not found", -1
     except subprocess.TimeoutExpired:
         return "Error: Command timed out", -1
     except Exception as e:
-        return str(e), -1
+        return f"Error: {e}", -1
 
-# --------------- UPDATED: Per-connection session (authenticated state) ---------------
+# --------------- Per-connection session (authenticated state) ---------------
 
 def handle_client(conn: ssl.SSLSocket, addr):
     """
-    Handle client connection. UPDATED: Requires login before commands.
-    Maintains authenticated session per connection.
+    Handle one client connection.
+    Requires login first, then accepts command execution requests.
     """
     authenticated = False
     username = None
 
-    # UPDATED: Set socket timeout for error handling
     conn.settimeout(SOCKET_TIMEOUT)
 
     print("[+] Client connected:", addr)
@@ -197,7 +226,6 @@ def handle_client(conn: ssl.SSLSocket, addr):
             msg_type = msg.get("type")
             data = msg.get("data") or {}
 
-            # UPDATED: Must login first
             if msg_type == "login":
                 user = data.get("username", "").strip()
                 password = data.get("password", "")
@@ -210,12 +238,39 @@ def handle_client(conn: ssl.SSLSocket, addr):
                 if verify_user(user, password):
                     authenticated = True
                     username = user
+
                     send_message(conn, {"type": "login_success", "data": {"username": username}})
                     log_audit(username, addr, "LOGIN", "SUCCESS")
                     print(f"[AUTH] {username} logged in from {addr}")
                 else:
                     send_message(conn, {"type": "login_failure", "data": {"message": "Invalid username or password"}})
                     log_audit(user, addr, "LOGIN", "FAILED", "Invalid credentials")
+
+            elif msg_type == "register":
+                user = data.get("username", "").strip()
+                password = data.get("password", "")
+
+                if not user or not password:
+                    send_message(conn, {"type": "register_failure", "data": {"message": "Username/password required"}})
+                    continue
+                if len(user) < 3 or len(user) > 30:
+                    send_message(conn, {"type": "register_failure", "data": {"message": "Username must be 3-30 chars"}})
+                    continue
+                if any(ch.isspace() for ch in user):
+                    send_message(conn, {"type": "register_failure", "data": {"message": "Username cannot contain spaces"}})
+                    continue
+                if len(password) < 6:
+                    send_message(conn, {"type": "register_failure", "data": {"message": "Password must be at least 6 chars"}})
+                    continue
+                if user_exists(user):
+                    send_message(conn, {"type": "register_failure", "data": {"message": "Username already exists"}})
+                    log_audit(user, addr, "REGISTER", "FAILED", "User exists")
+                    continue
+
+                register_user(user, password)
+                send_message(conn, {"type": "register_success", "data": {"username": user}})
+                log_audit(user, addr, "REGISTER", "SUCCESS")
+                print(f"[AUTH] Registered new user: {user} from {addr}")
 
             elif msg_type == "command":
                 if not authenticated:
@@ -239,6 +294,9 @@ def handle_client(conn: ssl.SSLSocket, addr):
                 log_audit(username, addr, command, "EXECUTED" if exit_code == 0 else "FAILED")
                 print(f"[CMD] {username}: {command}")
 
+            elif msg_type == "logout":
+                break
+
             else:
                 send_message(conn, {"type": "error", "data": {"message": f"Unknown message type: {msg_type}"}})
 
@@ -253,13 +311,15 @@ def handle_client(conn: ssl.SSLSocket, addr):
                 log_audit(username, addr, "(error)", "ERROR", str(e))
             break
 
+    if username:
+        log_audit(username, addr, "LOGOUT", "SUCCESS")
     conn.close()
     print("Client disconnected:", addr)
 
-# --------------- UPDATED: Server startup with SSL ---------------
+# --------------- Server startup with SSL ---------------
 
 def start_server():
-    """Start TLS server with threading for multiple clients."""
+    """Start TLS server with threading for multiple command clients."""
     ensure_user_db()
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -267,7 +327,6 @@ def start_server():
     server_socket.bind((HOST, PORT))
     server_socket.listen(5)
 
-    # UPDATED: Use ssl_config for context
     context = create_server_ssl_context()
 
     print(f"[SECURE SERVER] Listening on {HOST}:{PORT} (TLS)")
@@ -276,7 +335,6 @@ def start_server():
     while True:
         try:
             client_socket, addr = server_socket.accept()
-            # UPDATED: Wrap with TLS before handling
             try:
                 secure_conn = context.wrap_socket(client_socket, server_side=True)
             except ssl.SSLError as e:
